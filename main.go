@@ -3,31 +3,41 @@ package main
 import (
 	"image"
 	"image/color"
-	"image/png"
-	_ "image/png"
+
+	"golang.org/x/image/bmp"
+	// "image/jpeg"
+	// "image/png"
 	"log"
 	"os"
 )
 
 func main() {
 
-	bounds, redColor, greenColor, blueColor, alphaChannel := openImage("./image/eye.png")
-	Red, Green, Blue, Alpha := RSAEncryptImage(redColor, greenColor, blueColor, alphaChannel)
-	generateImage("./image/encrypted.png", &bounds, Red, Green, Blue, Alpha)
+	// bounds, redColor, greenColor, blueColor, alphaChannel := openImage("./image/eye.png")
+	// Red, Green, Blue, Alpha := RSAEncryptImage(redColor, greenColor, blueColor, alphaChannel)
+	// generateImage("./image/encrypted.png", &bounds, Red, Green, Blue, Alpha)
 
 	// bounds, redColor, greenColor, blueColor, alphaChannel := openImage("./image/encrypted.png")
 	// Red, Green, Blue, Alpha := RSADecryptImage(redColor, greenColor, blueColor, alphaChannel)
 	// generateImage("./image/decrypted.png", &bounds, Red, Green, Blue, Alpha)
+
+	bounds, inputPlainColor := openImage("./image/eye.bmp")
+	encryptedColor := AESEncryptImage(inputPlainColor)
+	generateImage("./image/EncryptedAES.bmp", &bounds, encryptedColor)
+
+	bounds, inputColor2 := openImage("./image/EncryptedAES.bmp")
+	decryptedColor := AESDecryptImage(inputColor2)
+	generateImage("./image/DecryptedAES.png", &bounds, decryptedColor)
 }
 
-func openImage(imageFile string) (bounds image.Rectangle, redColor []byte, greenColor []byte, blueColor []byte, alphaChannel []byte) {
+func openImage(imageFile string) (bounds image.Rectangle, c arrayColor) {
 	reader, err := os.Open(imageFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer reader.Close()
 
-	m, _, err := image.Decode(reader)
+	m, err := bmp.Decode(reader)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,27 +49,34 @@ func openImage(imageFile string) (bounds image.Rectangle, redColor []byte, green
 	maxWidth := bounds.Max.X
 	maxLengthColor := maxHeight * maxWidth
 
-	redColor = make([]byte, maxLengthColor)
-	greenColor = make([]byte, maxLengthColor)
-	blueColor = make([]byte, maxLengthColor)
-	alphaChannel = make([]byte, maxLengthColor)
+	redColor := make([]byte, maxLengthColor)
+	greenColor := make([]byte, maxLengthColor)
+	blueColor := make([]byte, maxLengthColor)
+	alphaChannel := make([]byte, maxLengthColor)
 
 	index := 0
 	for y := bounds.Min.Y; y < maxHeight; y++ {
 		for x := bounds.Min.X; x < maxWidth; x++ {
 			r, g, b, a := m.At(x, y).RGBA()
-			redColor[index] = byte(r)
-			greenColor[index] = byte(g)
-			blueColor[index] = byte(b)
-			alphaChannel[index] = byte(a)
+			redColor[index] = uint8(r >> 8)
+			greenColor[index] = uint8(g >> 8)
+			blueColor[index] = uint8(b >> 8)
+			alphaChannel[index] = uint8(a >> 8)
 			index++
 		}
+	}
+
+	c = arrayColor{
+		red:   redColor,
+		green: greenColor,
+		blue:  blueColor,
+		alpha: alphaChannel,
 	}
 
 	return
 }
 
-func generateImage(imageName string, bounds *image.Rectangle, Red []byte, Green []byte, Blue []byte, Alpha []byte) {
+func generateImage(imageName string, bounds *image.Rectangle, c arrayColor) {
 	newImg := image.NewNRGBA(image.Rect(0, 0, bounds.Max.X, bounds.Max.Y))
 	maxHeight := bounds.Max.Y
 	maxWidth := bounds.Max.X
@@ -67,11 +84,11 @@ func generateImage(imageName string, bounds *image.Rectangle, Red []byte, Green 
 	for y := bounds.Min.Y; y < maxHeight; y++ {
 		for x := bounds.Min.X; x < maxWidth; x++ {
 			index := ((maxWidth - 1) * y) + (x + y)
-			newImg.Set(x, y, color.NRGBA{
-				R: Red[index],
-				G: Green[index],
-				B: Blue[index],
-				A: Alpha[index],
+			newImg.Set(x, y, color.RGBA{
+				R: c.red[index],
+				G: c.green[index],
+				B: c.blue[index],
+				A: c.alpha[index],
 			})
 		}
 	}
@@ -81,7 +98,7 @@ func generateImage(imageName string, bounds *image.Rectangle, Red []byte, Green 
 		log.Fatal(err)
 	}
 
-	if err := png.Encode(f, newImg); err != nil {
+	if err := bmp.Encode(f, newImg); err != nil {
 		f.Close()
 		log.Fatal(err)
 	}
