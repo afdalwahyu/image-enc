@@ -21,13 +21,16 @@ func main() {
 	// Red, Green, Blue, Alpha := RSADecryptImage(redColor, greenColor, blueColor, alphaChannel)
 	// generateImage("./image/decrypted.png", &bounds, Red, Green, Blue, Alpha)
 
-	bounds, inputPlainColor := openImage("./image/eye.bmp")
-	encryptedColor := AESEncryptImage(inputPlainColor)
-	generateImage("./image/EncryptedAES.bmp", &bounds, encryptedColor)
+	// bounds, inputPlainColor := openImage("./image/eye.bmp")
+	// encryptedColor := AESEncryptImage(inputPlainColor)
+	// generateImage("./image/EncryptedAES.bmp", &bounds, encryptedColor)
 
-	bounds, inputColor2 := openImage("./image/EncryptedAES.bmp")
-	decryptedColor := AESDecryptImage(inputColor2)
-	generateImage("./image/DecryptedAES.png", &bounds, decryptedColor)
+	// bounds, inputColor2 := openImage("./image/EncryptedAES.bmp")
+	// decryptedColor := AESDecryptImage(inputColor2)
+	// generateImage("./image/DecryptedAES.bmp", &bounds, decryptedColor)
+
+	bounds, inputPlainColor := openImage("./image/eye.bmp")
+	ChaosEncrypt(&bounds, &inputPlainColor)
 }
 
 func openImage(imageFile string) (bounds image.Rectangle, c arrayColor) {
