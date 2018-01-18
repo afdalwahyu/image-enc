@@ -29,8 +29,21 @@ func main() {
 	// decryptedColor := AESDecryptImage(inputColor2)
 	// generateImage("./image/DecryptedAES.bmp", &bounds, decryptedColor)
 
+	// bounds, inputPlainColor := openImage("./image/4x4pixel.bmp")
+	// encryptedColor := chaosEncrypt(&bounds, &inputPlainColor)
+	// generateImage("./image/4x4pixel-enc.bmp", &bounds, encryptedColor)
+
+	// bounds2, inputPlainColor2 := openImage("./image/4x4pixel-enc.bmp")
+	// decryptedColor := chaosDecrypt(&bounds2, &inputPlainColor2)
+	// generateImage("./image/4x4pixel-dec.bmp", &bounds2, decryptedColor)
+
 	bounds, inputPlainColor := openImage("./image/eye.bmp")
-	ChaosEncrypt(&bounds, &inputPlainColor)
+	encryptedColor := chaosEncrypt(&bounds, &inputPlainColor)
+	generateImage("./image/eye-enc.bmp", &bounds, encryptedColor)
+
+	bounds2, inputPlainColor2 := openImage("./image/eye-enc.bmp")
+	decryptedColor := chaosDecrypt(&bounds2, &inputPlainColor2)
+	generateImage("./image/eye-dec.bmp", &bounds2, decryptedColor)
 }
 
 func openImage(imageFile string) (bounds image.Rectangle, c arrayColor) {

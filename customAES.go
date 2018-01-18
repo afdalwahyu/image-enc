@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 )
 
+// arrayColor Color of image
 type arrayColor struct {
 	red, green, blue, alpha []byte
 }
