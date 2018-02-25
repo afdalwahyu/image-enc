@@ -1,13 +1,15 @@
-package main
+package chaos
 
-// ChaosKey Key that will be as initial value
+// Key Key that will be as initial value
 import (
 	"errors"
 	"image"
 	"math"
+    "1-learn/util"
 )
 
-type ChaosKey struct {
+// Key variable that use to encrypt / decrypt
+type Key struct {
 	X0 float64
 	u  float64
 	k  float64
@@ -15,31 +17,30 @@ type ChaosKey struct {
 	lp int
 }
 
-// ChaosPixel Type value of chaos with pixel
-type ChaosPixel struct {
+// Pixel Type value of chaos with pixel
+type Pixel struct {
 	pixel byte
 	chaos float64
 	index int
 }
 
-// ChaosPixelSequence Type of sequence that wll be generated from logistic2 map sequence
-type ChaosPixelSequence []ChaosPixel
+// PixelSequence Type of sequence that wll be generated from logistic2 map sequence
+type PixelSequence []Pixel
 
 // ByChaos sort based on chaos value
-type ByChaos []ChaosPixel
+type ByChaos []Pixel
 
 func (c ByChaos) Len() int           { return len(c) }
 func (c ByChaos) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c ByChaos) Less(i, j int) bool { return c[i].chaos < c[j].chaos }
 
 // NewChaosKey create chaos key
-// TODO: k still unknown?
-func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float64, lp int) (*ChaosKey, error) {
-
+func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float64, lp int) (*Key, error) {
+    // k still unknown?
 	maxLen := 3 * bounds.Max.X * bounds.Max.Y
 
 	if N0 < 0 {
-		return nil, errors.New("Cannot use N0 below 0")
+		return nil, errors.New("cannot use N0 below 0")
 	}
 
 	if u < 0 || u > 10 {
@@ -47,14 +48,14 @@ func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float
 	}
 
 	if X0 < 0 {
-		return nil, errors.New("X0 as population cannot be below 10")
+		return nil, errors.New("x0 as population cannot be below 10")
 	}
 
 	if lp < 1 || lp > maxLen {
 		return nil, errors.New("lp key length chaos sequence invalid")
 	}
 
-	return &ChaosKey{
+	return &Key{
 		X0: X0,
 		u:  u,
 		k:  k,
@@ -63,18 +64,18 @@ func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float
 	}, nil
 }
 
-func splitChiperToRGB(buf []byte, alphaChannel []byte) arrayColor {
+func splitCipherToRGB(buf []byte, alphaChannel []byte) util.ArrayColor{
 	lim := len(buf) / 3
 
-	return arrayColor{
-		red:   buf[:lim],
-		green: buf[lim : 2*lim],
-		blue:  buf[2*lim:],
-		alpha: alphaChannel,
+	return util.ArrayColor{
+		Red:   buf[:lim],
+		Green: buf[lim : 2*lim],
+		Blue:  buf[2*lim:],
+		Alpha: alphaChannel,
 	}
 }
 
-func (key *ChaosKey) generateLogisticLogisticMapSequence(length int) []float64 {
+func (key *Key) generateLogisticLogisticMapSequence(length int) []float64 {
 	maxLength := length + key.N0
 	logisticSequence := make([]float64, maxLength)
 
