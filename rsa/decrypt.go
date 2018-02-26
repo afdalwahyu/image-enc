@@ -16,9 +16,9 @@ func (key *Key) DecryptImage(c *util.ArrayColor) util.ArrayColor {
     k := (key.Public.N.BitLen()) / 8
     maxSize := k - 1
 
-    redConcat := generateConcatColor(c.Red, maxSize)
-    greenConcat := generateConcatColor(c.Green, maxSize)
-    blueConcat := generateConcatColor(c.Blue, maxSize)
+    redConcat := GenerateConcatColor(c.Red, maxSize)
+    greenConcat := GenerateConcatColor(c.Green, maxSize)
+    blueConcat := GenerateConcatColor(c.Blue, maxSize)
 
     DecRed := decryptConcatColor(key.Private, redConcat)
     DecGreen := decryptConcatColor(key.Private, greenConcat)
@@ -48,7 +48,7 @@ func decryptConcatColor(privateKey *rsa.PrivateKey, concatColor [][]byte) []byte
         // if err != nil {
         // 	log.Fatal(err)
         // }
-        message := decrypt(privateKey, new(big.Int).SetBytes(el))
+        message := Decrypt(privateKey, new(big.Int).SetBytes(el))
         buffer.Write(message)
     }
 
@@ -59,6 +59,6 @@ func testDecrypt(privateKey *rsa.PrivateKey, c *big.Int) []byte {
     return new(big.Int).Add(c, big.NewInt(-10)).Bytes()
 }
 
-func decrypt(privateKey *rsa.PrivateKey, c *big.Int) []byte {
+func Decrypt(privateKey *rsa.PrivateKey, c *big.Int) []byte {
     return new(big.Int).Exp(c, privateKey.D, privateKey.N).Bytes()
 }

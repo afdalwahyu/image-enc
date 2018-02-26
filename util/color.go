@@ -43,8 +43,8 @@ func (img *ImageFile) OpenImage() (bounds image.Rectangle, c ArrayColor) {
     alphaChannel := make([]byte, maxLengthColor)
 
     index := 0
-    for y := bounds.Min.Y; y < maxHeight; y++ {
-        for x := bounds.Min.X; x < maxWidth; x++ {
+    for x := bounds.Min.X; x < maxWidth; x++ {
+        for y := bounds.Min.Y; y < maxHeight; y++ {
             r, g, b, a := m.At(x, y).RGBA()
             redColor[index] = uint8(r >> 8)
             greenColor[index] = uint8(g >> 8)
@@ -64,16 +64,14 @@ func (img *ImageFile) OpenImage() (bounds image.Rectangle, c ArrayColor) {
     return
 }
 
-
-
 func (img ImageFile) WriteImage(bounds *image.Rectangle, c ArrayColor) {
     newImg := image.NewNRGBA(image.Rect(0, 0, bounds.Max.X, bounds.Max.Y))
     maxHeight := bounds.Max.Y
     maxWidth := bounds.Max.X
 
-    for y := bounds.Min.Y; y < maxHeight; y++ {
-        for x := bounds.Min.X; x < maxWidth; x++ {
-            index := ((maxWidth - 1) * y) + (x + y)
+    for x := bounds.Min.X; x < maxWidth; x++ {
+        for y := bounds.Min.Y; y < maxHeight; y++ {
+            index := ((maxHeight - 1) * x) + (x + y)
             newImg.Set(x, y, color.RGBA{
                 R: c.Red[index],
                 G: c.Green[index],
@@ -97,4 +95,3 @@ func (img ImageFile) WriteImage(bounds *image.Rectangle, c ArrayColor) {
         log.Fatal(err)
     }
 }
-

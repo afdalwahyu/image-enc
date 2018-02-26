@@ -17,9 +17,9 @@ func (key *Key) EncryptImage(c *util.ArrayColor) util.ArrayColor{
 	maxSize := k - 1
 	fmt.Println(maxSize)
 
-	redConcat := generateConcatColor(c.Red, maxSize)
-	greenConcat := generateConcatColor(c.Green, maxSize)
-	blueConcat := generateConcatColor(c.Blue, maxSize)
+	redConcat := GenerateConcatColor(c.Red, maxSize)
+	greenConcat := GenerateConcatColor(c.Green, maxSize)
+	blueConcat := GenerateConcatColor(c.Blue, maxSize)
 
 	EncRed := encryptConcatColor(key.Public, redConcat)
 	EncGreen := encryptConcatColor(key.Public, greenConcat)
@@ -49,7 +49,7 @@ func encryptConcatColor(publicKey *rsa.PublicKey, concattedColor [][]byte) []byt
 		// if err != nil {
 		// 	log.Fatal(err)
 		// }
-		cipherText := encrypt(new(big.Int), publicKey, new(big.Int).SetBytes(el))
+		cipherText := Encrypt(new(big.Int), publicKey, new(big.Int).SetBytes(el))
 		buffer.Write(cipherText)
 	}
 	return buffer.Bytes()
@@ -59,8 +59,9 @@ func testEncrypt(c *big.Int, pub *rsa.PublicKey, m *big.Int) []byte {
 	return c.Add(m, big.NewInt(10)).Bytes()
 }
 
-func encrypt(c *big.Int, pub *rsa.PublicKey, m *big.Int) []byte {
-	if m.Cmp(pub.N) == 1 {
+func Encrypt(c *big.Int, pub *rsa.PublicKey, m *big.Int) []byte {
+	//If message larger than N
+    if m.Cmp(pub.N) == 1 {
 		fmt.Println("m larger than N")
 	}
 	e := big.NewInt(int64(pub.E))

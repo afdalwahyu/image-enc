@@ -9,6 +9,8 @@ import (
     "io/ioutil"
     "log"
     "math/big"
+    "os"
+    "golang.org/x/image/bmp"
 )
 
 type Key struct {
@@ -46,7 +48,7 @@ func GenerateRSAKey() (*big.Int, *big.Int, *big.Int) {
     return privateKey.D, e, privateKey.N
 }
 
-func generateConcatColor(color []uint8, lim int) [][]byte {
+func GenerateConcatColor(color []uint8, lim int) [][]byte {
     var chunk []byte
 
     var buffer bytes.Buffer
@@ -67,4 +69,40 @@ func generateConcatColor(color []uint8, lim int) [][]byte {
     }
 
     return chunks
+}
+
+func (key *Key) LoadImage(path string) {
+    reader, err := os.Open(path)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer reader.Close()
+
+    m, err := bmp.Decode(reader)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    bounds := m.Bounds()
+
+    maxHeight := bounds.Max.Y
+    maxWidth := bounds.Max.X
+    maxLengthColor := maxHeight * maxWidth
+
+    redColor := make([]byte, maxLengthColor)
+    greenColor := make([]byte, maxLengthColor)
+    blueColor := make([]byte, maxLengthColor)
+    alphaChannel := make([]byte, maxLengthColor)
+
+    index := 0
+    for y := bounds.Min.Y; y < maxHeight; y++ {
+        for x := bounds.Min.X; x < maxWidth; x++ {
+            r, g, b, a := m.At(x, y).RGBA()
+            redColor[index] = uint8(r >> 8)
+            greenColor[index] = uint8(g >> 8)
+            blueColor[index] = uint8(b >> 8)
+            alphaChannel[index] = uint8(a >> 8)
+            index++
+        }
+    }
 }
