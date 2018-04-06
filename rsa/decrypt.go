@@ -1,64 +1,67 @@
 package rsa
 
 import (
-    "bytes"
-    "crypto/rsa"
-    "fmt"
-    "log"
-    "math/big"
-    "time"
-    "1-learn/util"
+	"bytes"
+	"crypto/rand"
+	"crypto/rsa"
+	"fmt"
+	"log"
+	"math/big"
+	"skripsi/util"
+	"time"
 )
 
 func (key *Key) DecryptImage(c *util.ArrayColor) util.ArrayColor {
-    start := time.Now()
+	start := time.Now()
 
-    k := (key.Public.N.BitLen()) / 8
-    maxSize := k - 1
+	k := (key.Public.N.BitLen()) / 8
+	maxSize := k
 
-    redConcat := GenerateConcatColor(c.Red, maxSize)
-    greenConcat := GenerateConcatColor(c.Green, maxSize)
-    blueConcat := GenerateConcatColor(c.Blue, maxSize)
+	redConcat := GenerateConcatColor(c.Red, maxSize)
+	greenConcat := GenerateConcatColor(c.Green, maxSize)
+	blueConcat := GenerateConcatColor(c.Blue, maxSize)
 
-    DecRed := decryptConcatColor(key.Private, redConcat)
-    DecGreen := decryptConcatColor(key.Private, greenConcat)
-    DecBlue := decryptConcatColor(key.Private, blueConcat)
+	DecRed := decryptConcatColor(key.Private, redConcat)
+	DecGreen := decryptConcatColor(key.Private, greenConcat)
+	DecBlue := decryptConcatColor(key.Private, blueConcat)
 
-    fmt.Println(len(c.Red), len(DecRed), len(redConcat))
-    fmt.Println(len(c.Green), len(DecGreen), len(greenConcat))
-    fmt.Println(len(c.Blue), len(DecBlue), len(blueConcat))
+	fmt.Println(len(c.Red), len(DecRed), len(redConcat))
+	fmt.Println(len(c.Green), len(DecGreen), len(greenConcat))
+	fmt.Println(len(c.Blue), len(DecBlue), len(blueConcat))
 
-    elapsed := time.Since(start)
-    log.Printf("RSA Decryption took %s", elapsed)
+	elapsed := time.Since(start)
+	log.Printf("RSA Decryption took %s", elapsed)
 
-    decryptedColor := util.ArrayColor{
-        Red:   DecRed,
-        Green: DecGreen,
-        Blue:  DecBlue,
-        Alpha: c.Alpha,
-    }
+	decryptedColor := util.ArrayColor{
+		Red:   DecRed,
+		Green: DecGreen,
+		Blue:  DecBlue,
+		Alpha: c.Alpha,
+	}
 
-    return decryptedColor
+	return decryptedColor
 }
 
 func decryptConcatColor(privateKey *rsa.PrivateKey, concatColor [][]byte) []byte {
-    var buffer bytes.Buffer
-    for _, el := range concatColor {
-        // message, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, el)
-        // if err != nil {
-        // 	log.Fatal(err)
-        // }
-        message := Decrypt(privateKey, new(big.Int).SetBytes(el))
-        buffer.Write(message)
-    }
+	var buffer bytes.Buffer
+	for _, el := range concatColor {
+		message, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, el)
+		if err != nil {
+			buffer.Write(el)
+			continue
+		}
+		// fmt.Println("Decrypting...", len(el))
+		// message := Decrypt(privateKey, new(big.Int).SetBytes(el))
+		buffer.Write(message)
+	}
 
-    return buffer.Bytes()
+	return buffer.Bytes()
 }
 
 func testDecrypt(privateKey *rsa.PrivateKey, c *big.Int) []byte {
-    return new(big.Int).Add(c, big.NewInt(-10)).Bytes()
+	return new(big.Int).Add(c, big.NewInt(-10)).Bytes()
 }
 
 func Decrypt(privateKey *rsa.PrivateKey, c *big.Int) []byte {
-    return new(big.Int).Exp(c, privateKey.D, privateKey.N).Bytes()
+	return new(big.Int).Exp(c, privateKey.D, privateKey.N).Bytes()
 }

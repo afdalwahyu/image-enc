@@ -4,7 +4,7 @@ import (
     "bytes"
     "crypto/aes"
     "crypto/cipher"
-    "1-learn/util"
+    "skripsi/util"
 )
 
 type Key struct {

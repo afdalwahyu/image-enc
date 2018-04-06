@@ -5,7 +5,7 @@ import (
 	"errors"
 	"image"
 	"math"
-    "1-learn/util"
+	"skripsi/util"
 )
 
 // Key variable that use to encrypt / decrypt
@@ -34,10 +34,16 @@ func (c ByChaos) Len() int           { return len(c) }
 func (c ByChaos) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c ByChaos) Less(i, j int) bool { return c[i].chaos < c[j].chaos }
 
-// NewChaosKey create chaos key
+// NewChaosKey create chaos 2048key
 func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float64, lp int) (*Key, error) {
-    // k still unknown?
+	// TODO: k is exponent that not less tahn 8 and that not larger than 20
+	// TODO: exponent is used when creating chaotic sequence
+	// k still unknown?
 	maxLen := 3 * bounds.Max.X * bounds.Max.Y
+
+	if k < 8 || k > 20 {
+		return nil, errors.New("k must be higher than 8 and below 20")
+	}
 
 	if N0 < 0 {
 		return nil, errors.New("cannot use N0 below 0")
@@ -52,7 +58,7 @@ func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float
 	}
 
 	if lp < 1 || lp > maxLen {
-		return nil, errors.New("lp key length chaos sequence invalid")
+		return nil, errors.New("lp 2048key length chaos sequence invalid")
 	}
 
 	return &Key{
@@ -64,7 +70,7 @@ func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float
 	}, nil
 }
 
-func splitCipherToRGB(buf []byte, alphaChannel []byte) util.ArrayColor{
+func splitCipherToRGB(buf []byte, alphaChannel []byte) util.ArrayColor {
 	lim := len(buf) / 3
 
 	return util.ArrayColor{

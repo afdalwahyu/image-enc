@@ -2,19 +2,20 @@ package rsa
 
 import (
 	"bytes"
+	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
 	"log"
 	"math/big"
+	"skripsi/util"
 	"time"
-    "1-learn/util"
 )
 
-func (key *Key) EncryptImage(c *util.ArrayColor) util.ArrayColor{
+func (key *Key) EncryptImage(c *util.ArrayColor) util.ArrayColor {
 	start := time.Now()
 
 	k := (key.Public.N.BitLen()) / 8
-	maxSize := k - 1
+	maxSize := k - 11
 	fmt.Println(maxSize)
 
 	redConcat := GenerateConcatColor(c.Red, maxSize)
@@ -45,11 +46,12 @@ func (key *Key) EncryptImage(c *util.ArrayColor) util.ArrayColor{
 func encryptConcatColor(publicKey *rsa.PublicKey, concattedColor [][]byte) []byte {
 	var buffer bytes.Buffer
 	for _, el := range concattedColor {
-		// cipherText, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey, el)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		cipherText := Encrypt(new(big.Int), publicKey, new(big.Int).SetBytes(el))
+		cipherText, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey, el)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// cipherText := Encrypt(new(big.Int), publicKey, new(big.Int).SetBytes(el))
+		// fmt.Println("Encrypted...", len(cipherText))
 		buffer.Write(cipherText)
 	}
 	return buffer.Bytes()
@@ -61,7 +63,7 @@ func testEncrypt(c *big.Int, pub *rsa.PublicKey, m *big.Int) []byte {
 
 func Encrypt(c *big.Int, pub *rsa.PublicKey, m *big.Int) []byte {
 	//If message larger than N
-    if m.Cmp(pub.N) == 1 {
+	if m.Cmp(pub.N) == 1 {
 		fmt.Println("m larger than N")
 	}
 	e := big.NewInt(int64(pub.E))

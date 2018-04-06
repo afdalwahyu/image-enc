@@ -4,7 +4,7 @@ import (
     "image"
     "math"
     "sort"
-    "1-learn/util"
+    "skripsi/util"
 )
 
 // ChaosDecrypt decrypt using chaos algorithm
@@ -14,7 +14,7 @@ func (key *Key) ChaosDecrypt(bounds *image.Rectangle, c *util.ArrayColor) util.A
     cipherPixels = append(cipherPixels, c.Green...)
     cipherPixels = append(cipherPixels, c.Blue...)
 
-    //key, err := NewChaosKey(bounds, 1000, 0.5, 3.6, 0.0, 5)
+    //2048key, err := NewChaosKey(bounds, 1000, 0.5, 3.6, 0.0, 5)
     //if err != nil {
     //	log.Fatal(err)
     //}

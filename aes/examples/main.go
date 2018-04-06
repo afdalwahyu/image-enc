@@ -10,7 +10,7 @@ func main() {
     eyeEncrypted := &util.ImageFile{Path: "eye-encrypted.bmp"}
     eyeDecrypted := &util.ImageFile{Path: "eye-decrypted.bmp"}
 
-    key, _ := aes.NewKey("example key 1234")
+    key, _ := aes.NewKey("example 2048key 1234")
 
     bounds, inputPlainColor := eyeOriginal.OpenImage()
     encryptedColor := key.AESEncryptImage(inputPlainColor)
