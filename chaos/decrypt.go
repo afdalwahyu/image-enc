@@ -2,13 +2,17 @@ package chaos
 
 import (
 	"image"
+	"log"
 	"math"
 	"skripsi/util"
 	"sort"
+	"time"
 )
 
 // ChaosDecrypt decrypt using chaos algorithm
 func (key *Key) ChaosDecrypt(bounds *image.Rectangle, c *util.ArrayColor) util.ArrayColor {
+	start := time.Now()
+
 	cipherPixels := make([]byte, 0)
 	cipherPixels = append(cipherPixels, c.Red...)
 	cipherPixels = append(cipherPixels, c.Green...)
@@ -52,6 +56,9 @@ func (key *Key) ChaosDecrypt(bounds *image.Rectangle, c *util.ArrayColor) util.A
 	for index, pixelC := range chaosPlainPixels {
 		decryptedPixels[pixelC.index] = tmpPixel[index]
 	}
+
+	elapsed := time.Since(start)
+	log.Printf("Chaos Decryption took %s", elapsed)
 
 	decryptedColors := splitCipherToRGB(decryptedPixels, c.Alpha)
 	return decryptedColors

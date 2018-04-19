@@ -21,11 +21,8 @@ func (key *Key) EncryptImage(c *util.ArrayColor) util.ArrayColor {
 	greenConcat := GenerateConcatColor(c.Green, maxSize)
 	blueConcat := GenerateConcatColor(c.Blue, maxSize)
 
-	fmt.Println("red")
 	EncRed := encryptConcatColor(key.Public, redConcat)
-	fmt.Println("green")
 	EncGreen := encryptConcatColor(key.Public, greenConcat)
-	fmt.Println("blue")
 	EncBlue := encryptConcatColor(key.Public, blueConcat)
 
 	// fmt.Println(len(c.Red), len(EncRed), len(redConcat))

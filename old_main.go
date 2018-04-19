@@ -40,6 +40,42 @@ func main() {
 			Usage:       "chaotic sequence, only LLM, SSM, CCM",
 			Destination: &sequence,
 		},
+		cli.StringFlag{
+			Name:        "aespwd, ap",
+			Value:       "afdal",
+			Usage:       "AES password",
+			Destination: &sequence,
+		},
+		cli.StringFlag{
+			Name:        "public, pub",
+			Value:       "",
+			Usage:       "Public key path file",
+			Destination: &sequence,
+		},
+		cli.StringFlag{
+			Name:        "private, priv",
+			Value:       "",
+			Usage:       "Private key path file",
+			Destination: &sequence,
+		},
+		cli.StringFlag{
+			Name:        "k",
+			Value:       "",
+			Usage:       "chaos k key",
+			Destination: &sequence,
+		},
+		cli.StringFlag{
+			Name:        "u",
+			Value:       "",
+			Usage:       "chaos u key",
+			Destination: &sequence,
+		},
+		cli.StringFlag{
+			Name:        "x0",
+			Value:       "",
+			Usage:       "chaos x0 key",
+			Destination: &sequence,
+		},
 	}
 
 	app.Commands = []cli.Command{

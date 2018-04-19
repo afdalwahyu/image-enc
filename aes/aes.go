@@ -6,7 +6,9 @@ import (
 	"crypto/cipher"
 	"crypto/md5"
 	"io"
+	"log"
 	"skripsi/util"
+	"time"
 )
 
 type Key struct {
@@ -31,6 +33,7 @@ func NewKey(password string) (*Key, error) {
 
 // AESEncryptImage encrypt using aes
 func (key *Key) AESEncryptImage(c util.ArrayColor) util.ArrayColor {
+	start := time.Now()
 	colorSize := key.Block.BlockSize()
 
 	splitRed := splitColor(c.Red, colorSize)
@@ -40,6 +43,9 @@ func (key *Key) AESEncryptImage(c util.ArrayColor) util.ArrayColor {
 	encryptedRed := encryptColor(splitRed, colorSize, key.Block)
 	encryptedGreen := encryptColor(splitGreen, colorSize, key.Block)
 	encryptedBlue := encryptColor(splitBlue, colorSize, key.Block)
+
+	elapsed := time.Since(start)
+	log.Printf("AES Encryption took %s", elapsed)
 
 	encryptedColor := util.ArrayColor{
 		Red:   encryptedRed,
@@ -64,6 +70,7 @@ func encryptColor(splitColor [][]byte, colorSize int, block cipher.Block) []byte
 
 // AESDecryptImage decrypt image using aes algorithm
 func (key *Key) AESDecryptImage(c util.ArrayColor) util.ArrayColor {
+	start := time.Now()
 	colorSize := key.Block.BlockSize()
 
 	splitRed := splitColor(c.Red, colorSize)
@@ -73,6 +80,9 @@ func (key *Key) AESDecryptImage(c util.ArrayColor) util.ArrayColor {
 	decryptedRed := decryptColor(splitRed, colorSize, key.Block)
 	decryptedGreen := decryptColor(splitGreen, colorSize, key.Block)
 	decryptedBlue := decryptColor(splitBlue, colorSize, key.Block)
+
+	elapsed := time.Since(start)
+	log.Printf("AES Decryption took %s", elapsed)
 
 	encryptedColor := util.ArrayColor{
 		Red:   decryptedRed,

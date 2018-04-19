@@ -2,13 +2,16 @@ package chaos
 
 import (
 	"image"
+	"log"
 	"math"
 	"skripsi/util"
 	"sort"
+	"time"
 )
 
 // ChaosEncrypt Encrypt using chaos and logistic map
 func (key *Key) ChaosEncrypt(bounds *image.Rectangle, c *util.ArrayColor) util.ArrayColor {
+	start := time.Now()
 	// Step 1: Get 3 color
 	// Step 2: Concat 3 color to 1d array
 	plainPixels := make([]byte, 0)
@@ -59,6 +62,9 @@ func (key *Key) ChaosEncrypt(bounds *image.Rectangle, c *util.ArrayColor) util.A
 	tmp := cipher[:key.lp]
 	cipher = cipher[key.lp:]
 	cipher = append(cipher, tmp...)
+
+	elapsed := time.Since(start)
+	log.Printf("Chaos Encryption took %s", elapsed)
 
 	encryptedColors := splitCipherToRGB(cipher, c.Alpha)
 

@@ -3,7 +3,6 @@ package rsa
 import (
 	"bytes"
 	"crypto/rsa"
-	"fmt"
 	"log"
 	"math/big"
 	"skripsi/util"
@@ -20,11 +19,8 @@ func (key *Key) DecryptImage(c *util.ArrayColor) util.ArrayColor {
 	greenConcat := GenerateConcatColor(c.Green, maxSize)
 	blueConcat := GenerateConcatColor(c.Blue, maxSize)
 
-	fmt.Println("red")
 	DecRed := decryptConcatColor(key.Private, redConcat)
-	fmt.Println("green")
 	DecGreen := decryptConcatColor(key.Private, greenConcat)
-	fmt.Println("blue")
 	DecBlue := decryptConcatColor(key.Private, blueConcat)
 
 	// fmt.Println(len(c.Red), len(DecRed), len(redConcat))

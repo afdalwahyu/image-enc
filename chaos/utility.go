@@ -35,7 +35,7 @@ func (c ByChaos) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c ByChaos) Less(i, j int) bool { return c[i].chaos < c[j].chaos }
 
 // NewChaosKey create chaos 2048key
-func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float64, lp int) (*Key, error) {
+func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k int64, lp int) (*Key, error) {
 	maxLen := 3 * bounds.Max.X * bounds.Max.Y
 
 	if k < 8 || k > 20 {
@@ -61,7 +61,7 @@ func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float
 	return &Key{
 		X0: X0,
 		u:  u,
-		k:  k,
+		k:  float64(k),
 		N0: N0,
 		lp: lp,
 	}, nil
