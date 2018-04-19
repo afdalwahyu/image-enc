@@ -36,9 +36,6 @@ func (c ByChaos) Less(i, j int) bool { return c[i].chaos < c[j].chaos }
 
 // NewChaosKey create chaos 2048key
 func NewChaosKey(bounds *image.Rectangle, N0 int, X0 float64, u float64, k float64, lp int) (*Key, error) {
-	// TODO: k is exponent that not less tahn 8 and that not larger than 20
-	// TODO: exponent is used when creating chaotic sequence
-	// k still unknown?
 	maxLen := 3 * bounds.Max.X * bounds.Max.Y
 
 	if k < 8 || k > 20 {
@@ -87,10 +84,39 @@ func (key *Key) generateLogisticLogisticMapSequence(length int) []float64 {
 
 	logisticSequence[0] = key.X0
 	for i := 1; i < maxLength; i++ {
-		firstLogistic := key.u * logisticSequence[i-1] * (1 - logisticSequence[i-1]) * math.Pow(2, 14)
+		firstLogistic := key.u * logisticSequence[i-1] * (1 - logisticSequence[i-1]) * math.Pow(2, key.k)
 		secondLogistic := math.Floor(firstLogistic)
 		logisticSequence[i] = firstLogistic - secondLogistic
 	}
 
-	return logisticSequence
+	return logisticSequence[key.N0:]
+}
+
+func (key *Key) generateSineSineMapSequence(length int) []float64 {
+	maxLength := length + key.N0
+	sineSequence := make([]float64, maxLength)
+
+	sineSequence[0] = key.X0
+	for i := 1; i < maxLength; i++ {
+		firstSine := key.u * math.Sin(math.Pi*sineSequence[i-1]) * math.Pow(2, key.k)
+		secondSine := math.Floor(firstSine)
+		sineSequence[i] = firstSine - secondSine
+	}
+
+	return sineSequence[key.N0:]
+}
+
+func (key *Key) generateChebyshevChebyshevMapSequence(length int) []float64 {
+	maxLength := length + key.N0
+	chebyshevSequence := make([]float64, maxLength)
+
+	chebyshevSequence[0] = key.X0
+	for i := 1; i < maxLength; i++ {
+		firstChebyshev := math.Cos((key.u+1)*math.Acos(chebyshevSequence[i-1])) *
+			math.Pow(2, key.k)
+		secondChebyshev := math.Floor(firstChebyshev)
+		chebyshevSequence[i] = firstChebyshev - secondChebyshev
+	}
+
+	return chebyshevSequence[key.N0:]
 }

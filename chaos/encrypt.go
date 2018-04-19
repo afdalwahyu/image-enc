@@ -17,15 +17,10 @@ func (key *Key) ChaosEncrypt(bounds *image.Rectangle, c *util.ArrayColor) util.A
 	plainPixels = append(plainPixels, c.Blue...)
 
 	// Step 3: Generate chaotic sequence
-	//         2048key that used to generate: x0, u, k
 	//         iterate sequence len(Step2)+N0 times
 	//         get sequence from N0 to last as chaos sequence
-	//2048key, err := NewChaosKey(bounds, 1000, 0.5, 3.6, 0.0, 5)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
 
-	chaosSequence := key.generateLogisticLogisticMapSequence(len(plainPixels))[key.N0:]
+	chaosSequence := key.generateLogisticLogisticMapSequence(len(plainPixels))
 
 	chaosPixels := make(PixelSequence, 0)
 	for index, chaos := range chaosSequence {

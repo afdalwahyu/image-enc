@@ -14,11 +14,13 @@ import (
 	"golang.org/x/image/bmp"
 )
 
+// Key that used for rsa encryption
 type Key struct {
 	Private *rsa.PrivateKey
 	Public  *rsa.PublicKey
 }
 
+// LoadKey from a file
 func LoadKey(privateKeyPath string) (*Key, error) {
 	data, err := ioutil.ReadFile(privateKeyPath)
 	if err != nil {
@@ -38,6 +40,27 @@ func LoadKey(privateKeyPath string) (*Key, error) {
 	}, nil
 }
 
+// LoadPublicKey from file
+func LoadPublicKey(publicKeyPath string) (*Key, error) {
+	data, err := ioutil.ReadFile(publicKeyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode(data)
+
+	decode, err := x509.ParsePKCS1PublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Key{
+		Private: nil,
+		Public:  decode,
+	}, nil
+}
+
+// GenerateRSAKey based on 16 bit
 func GenerateRSAKey() (*big.Int, *big.Int, *big.Int) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 16)
 	if err != nil {
@@ -49,6 +72,7 @@ func GenerateRSAKey() (*big.Int, *big.Int, *big.Int) {
 	return privateKey.D, e, privateKey.N
 }
 
+// GenerateConcatColor based on limit
 func GenerateConcatColor(color []uint8, lim int) [][]byte {
 	var chunk []byte
 
@@ -72,6 +96,36 @@ func GenerateConcatColor(color []uint8, lim int) [][]byte {
 	return chunks
 }
 
+func fillPad(src, dest []byte) {
+	remainingPad := len(dest) - len(src)
+	for i := 0; i < remainingPad; i++ {
+		dest[i] = 0
+	}
+	copy(dest[remainingPad:], src)
+}
+
+func fillPadForDecrypt(src, dest []byte) {
+	remainingPad := len(dest) - len(src)
+	if remainingPad < 0 {
+		return
+	}
+	for i := 0; i < remainingPad; i++ {
+		dest[i] = 0
+	}
+	copy(dest[remainingPad:], src)
+}
+
+func leftPad(input []byte, size int) (out []byte) {
+	n := len(input)
+	if n > size {
+		n = size
+	}
+	out = make([]byte, size)
+	copy(out[len(out)-n:], input)
+	return
+}
+
+// LoadImage from a file
 func (key *Key) LoadImage(path string) {
 	reader, err := os.Open(path)
 	if err != nil {
