@@ -11,6 +11,8 @@ import (
 
 // ChaosEncrypt Encrypt using chaos and logistic map
 func (key *Key) ChaosEncrypt(bounds *image.Rectangle, c *util.ArrayColor) util.ArrayColor {
+	var chaosSequence []float64
+
 	start := time.Now()
 	// Step 1: Get 3 color
 	// Step 2: Concat 3 color to 1d array
@@ -23,7 +25,13 @@ func (key *Key) ChaosEncrypt(bounds *image.Rectangle, c *util.ArrayColor) util.A
 	//         iterate sequence len(Step2)+N0 times
 	//         get sequence from N0 to last as chaos sequence
 
-	chaosSequence := key.generateLogisticLogisticMapSequence(len(plainPixels))
+	if key.sequence == "LLM" {
+		chaosSequence = key.generateLogisticLogisticMapSequence(len(plainPixels))
+	} else if key.sequence == "SSM" {
+		chaosSequence = key.generateSineSineMapSequence(len(plainPixels))
+	} else {
+		chaosSequence = key.generateChebyshevChebyshevMapSequence(len(plainPixels))
+	}
 
 	chaosPixels := make(PixelSequence, 0)
 	for index, chaos := range chaosSequence {

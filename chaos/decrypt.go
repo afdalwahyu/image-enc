@@ -11,6 +11,8 @@ import (
 
 // ChaosDecrypt decrypt using chaos algorithm
 func (key *Key) ChaosDecrypt(bounds *image.Rectangle, c *util.ArrayColor) util.ArrayColor {
+	var chaosSequence []float64
+
 	start := time.Now()
 
 	cipherPixels := make([]byte, 0)
@@ -22,7 +24,13 @@ func (key *Key) ChaosDecrypt(bounds *image.Rectangle, c *util.ArrayColor) util.A
 	cipherPixels = cipherPixels[len(cipherPixels)-key.lp:]
 	cipherPixels = append(cipherPixels, tmp2...)
 
-	chaosSequence := key.generateLogisticLogisticMapSequence(len(cipherPixels))
+	if key.sequence == "LLM" {
+		chaosSequence = key.generateLogisticLogisticMapSequence(len(cipherPixels))
+	} else if key.sequence == "SSM" {
+		chaosSequence = key.generateSineSineMapSequence(len(cipherPixels))
+	} else {
+		chaosSequence = key.generateChebyshevChebyshevMapSequence(len(cipherPixels))
+	}
 
 	diffusion := make([]byte, 0)
 	for _, chaos := range chaosSequence {

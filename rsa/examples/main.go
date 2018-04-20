@@ -9,7 +9,11 @@ import (
 )
 
 func main() {
-	key, _ := rsa.LoadKey("./key_file/1024key")
+	privKey, _ := rsa.LoadKey("./3072_priv")
+	pubKey, err := rsa.LoadPublicKey("./3072_pub")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	eyeOriginal := &util.ImageFile{Path: "eye.bmp"}
 	eyeEncrypted := &util.ImageFile{Path: "eye-encrypted.bmp"}
@@ -18,7 +22,7 @@ func main() {
 	bounds, inputPlain := eyeOriginal.OpenImage()
 
 	start := time.Now()
-	encryptedColor := key.EncryptImage(&inputPlain)
+	encryptedColor := pubKey.EncryptImage(&inputPlain)
 	elapsed := time.Since(start)
 	log.Printf("Encryption took %s", elapsed)
 
@@ -27,6 +31,6 @@ func main() {
 	fmt.Println("decrypting....")
 
 	bounds2, inputEncrypted := eyeEncrypted.OpenImage()
-	decryptedColor := key.DecryptImage(&inputEncrypted)
+	decryptedColor := privKey.DecryptImage(&inputEncrypted)
 	eyeDecrypted.WriteImage(&bounds2, decryptedColor)
 }

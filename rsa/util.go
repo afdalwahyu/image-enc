@@ -48,15 +48,20 @@ func LoadPublicKey(publicKeyPath string) (*Key, error) {
 	}
 
 	block, _ := pem.Decode(data)
+	if block == nil {
+		log.Fatalln("cannot load pub key")
+	}
 
-	decode, err := x509.ParsePKCS1PublicKey(block.Bytes)
+	decode, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
 
+	pub := decode.(*rsa.PublicKey)
+
 	return &Key{
 		Private: nil,
-		Public:  decode,
+		Public:  pub,
 	}, nil
 }
 
